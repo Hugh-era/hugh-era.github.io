@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>곰 일곱 마리 (Honey Jam) · 계정 삭제 / Delete account / 删除账号 / アカウント削除</title>
+<style>
+  body { font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "PingFang SC", "Hiragino Sans", "Noto Sans SC", "Noto Sans JP", sans-serif; max-width: 640px; margin: 0 auto; padding: 24px 18px 60px; line-height: 1.7; color: #3a2a1a; background: #fff8e8; }
+  h1 { font-size: 1.45em; }
+  input { font-size: 1.3em; width: 100%; box-sizing: border-box; padding: 10px; text-align: center; letter-spacing: 2px; border: 2px solid #d9a441; border-radius: 10px; text-transform: uppercase; }
+  button { font-size: 1.1em; margin-top: 12px; padding: 10px 20px; border: 0; border-radius: 10px; background: #b8432f; color: #fff; cursor: pointer; }
+  button:disabled { opacity: .5; }
+  #msg { margin-top: 14px; font-weight: bold; min-height: 1.5em; }
+  .box { background: #fff; border: 2px solid #f0c060; border-radius: 14px; padding: 16px; margin: 18px 0; }
+  .note { color: #8a6a3a; font-size: .92em; }
+</style>
+</head>
+<body>
+<h1>🍯 곰 일곱 마리 (Honey Jam) — 계정 삭제</h1>
+<p>게임 서버에 있는 내 계정 기록을 지웁니다. <b>지워지는 것:</b> 계정(무작위 번호 · 닉네임), 신선꿀 잔액 · 산 물건, 순위 · 같이 하기 기록, 게임 진행 백업, 복구 코드.<br>
+<span class="note">결제 주문 기록은 환불 · 법령 때문에 개인을 알아볼 수 없는 무작위 번호와 함께 남을 수 있습니다. 지운 뒤에는 되돌릴 수 없고, 남은 신선꿀은 환불되지 않습니다.</span></p>
+
+<div class="box">
+<p><b>방법 1 · 게임 안에서</b><br>설정 → 계정 · 복구 코드 → <b>온라인 기록 삭제</b></p>
+<p><b>방법 2 · 여기서 복구 코드로</b> (게임 설정 → 계정 · 복구 코드에서 만든 16자 코드)</p>
+<input id="code" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="24" autocomplete="off">
+<button id="go">계정 삭제 / Delete / 删除 / 削除</button>
+<div id="msg"></div>
+<p class="note">복구 코드가 없거나 앱을 이미 지웠다면 hughera.service@gmail.com로 게임 안 닉네임과 함께 삭제를 요청해 주세요.</p>
+</div>
+
+<h2>Delete your Honey Jam account</h2>
+<p>This deletes your account (random ID, nickname), premium currency balance and items, leaderboard and multiplayer records, progress backup and recovery code from our server. Order records may be kept with the random ID only, as required for refunds and by law. Deletion cannot be undone.</p>
+<p>In-game: <b>Settings → Account &amp; Recovery Code → Delete online data</b>, or enter your 16-character recovery code above. Without a code, e-mail hughera.service@gmail.com with your in-game nickname.</p>
+
+<h2 lang="zh-Hans">删除 Honey Jam 账号</h2>
+<p lang="zh-Hans">将从服务器删除您的账号（随机编号、昵称）、付费货币余额及已购物品、排行榜及多人游戏记录、进度备份和恢复码。订单记录可能仅与随机编号一起，依退款需要及法律规定保留。删除后无法恢复，剩余的付费货币不予退款。</p>
+<p lang="zh-Hans">游戏内：<b>设置 → 账号 · 恢复码 → 删除在线记录</b>，或在上方输入16位恢复码。如没有恢复码，请将游戏内昵称发送至 hughera.service@gmail.com 申请删除。</p>
+
+<h2 lang="ja">Honey Jam アカウントの削除</h2>
+<p lang="ja">サーバーからアカウント（ランダムな番号・ニックネーム）、有償通貨の残高と購入アイテム、ランキング・マルチプレイの記録、進行バックアップ、復旧コードを削除します。注文記録は返金対応および法令に基づき、ランダムな番号とともに残る場合があります。削除は取り消せず、残った有償通貨は返金されません。</p>
+<p lang="ja">ゲーム内：<b>設定 → アカウント・復旧コード → オンライン記録の削除</b>、または上の欄に16文字の復旧コードを入力してください。復旧コードがない場合は、ゲーム内のニックネームを添えて hughera.service@gmail.com まで削除をご依頼ください。</p>
+
+<script>
+const URL_ = "https://wkpasuhvoznedrgavtuf.supabase.co/rest/v1/rpc/acct_delete_by_code";
+const KEY = "sb_publishable_19eOhTLjfuXguQyUgRe1hg_h1Y1FS-M"; // 공개용 열쇠 (게임 안과 같음)
+const msg = document.getElementById("msg"), btn = document.getElementById("go");
+btn.onclick = async () => {
+  const code = document.getElementById("code").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (code.length !== 16) { msg.textContent = "복구 코드는 16자예요 / The code has 16 characters."; return; }
+  if (!confirm("정말 지울까요? 되돌릴 수 없어요.\nDelete your account? This cannot be undone.")) return;
+  btn.disabled = true; msg.textContent = "…";
+  try {
+    const r = await fetch(URL_, { method: "POST", headers: { "Content-Type": "application/json", apikey: KEY, Authorization: "Bearer " + KEY }, body: JSON.stringify({ p_code: code }) });
+    const t = await r.text();
+    if (r.ok && t.trim() === "true") msg.textContent = "삭제했어요. 고마웠어요! / Your account has been deleted.";
+    else if (r.ok) msg.textContent = "코드를 다시 확인해 주세요 / Code not found.";
+    else msg.textContent = "잠시 뒤에 다시 해 주세요 / Please try again later.";
+  } catch (e) { msg.textContent = "인터넷 연결을 확인해 주세요 / Network error."; }
+  btn.disabled = false;
+};
+</script>
+</body>
+</html>
